@@ -1,2 +1,3 @@
 #this will ignore the module for mysql for go
 go/pkg/linux_amd64/github.com/go-sql-driver/mysql.a
+Go/src/github.com/go-sql-driver/mysql

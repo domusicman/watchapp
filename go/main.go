@@ -17,7 +17,21 @@ type watchInfo struct {
 
 var (
 	tpl *template.Template
+	// cnn, err = sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
 )
+
+//function to connect to db
+func dbConn() (db *sql.DB) {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbPass := "root"
+	dbName := "appdb"
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp"+"(db:3306)/"+dbName)
+	if err != nil {
+		fmt.Println("dbConn not work")
+	}
+	return db
+}
 
 func init() {
 	tpl = template.Must(template.ParseGlob("/go/templates/*"))
@@ -48,17 +62,18 @@ func HandleError(w http.ResponseWriter, err error) {
 //This function takes id # as input and outputs watchid and corresponding brand
 
 func getWatch(id string) (watch watchInfo, err error) {
-	cnn, err := sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
-	defer cnn.Close()
+	db := dbConn()
+	// , err := sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
+	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = cnn.Ping()
+	err = db.Ping()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	err = cnn.QueryRow("SELECT id, brand from watches where id = ?;", id).Scan(&watch.ID, &watch.Brand)
+	err = db.QueryRow("SELECT id, brand from watches where id = ?;", id).Scan(&watch.ID, &watch.Brand)
 	if err != nil {
 		panic(err.Error())
 	}
