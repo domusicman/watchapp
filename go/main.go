@@ -44,11 +44,42 @@ func main() {
 
 //This function get watch id and brand using getWatch function and passes them to the gohtml template file
 func index(w http.ResponseWriter, r *http.Request) {
-	watch, err := getWatch("1")
-	HandleError(w, err)
+	db := dbConn()
+	defer db.Close()
+	sW, err := db.Query("SELECT * FROM watches order by id")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
-	err = tpl.ExecuteTemplate(w, "pic.gohtml", watch)
-	HandleError(w, err)
+	// do i need to add ";" at end of below function?
+	// check for naming convention in mysql vs code vs frontend
+	//sW (select watches)
+
+	wa := watchInfo{}
+	waS := []watchInfo{}
+
+	for sW.Next() {
+		var id int
+		var brand string
+		err = sW.Scan(&id, &brand)
+		if err != nil {
+			fmt.Println("sW.Scan didn't work")
+		}
+		wa.ID = id
+		wa.Brand = brand
+		waS = append(waS, wa)
+
+	}
+	tpl.ExecuteTemplate(w, "pic.gohtml", waS)
+	// watch, err := getWatch("1")
+	// HandleError(w, err)
+
+	// err = tpl.ExecuteTemplate(w, "pic.gohtml", watch)
+	// HandleError(w, err)
 
 }
 
@@ -61,22 +92,43 @@ func HandleError(w http.ResponseWriter, err error) {
 
 //This function takes id # as input and outputs watchid and corresponding brand
 
-func getWatch(id string) (watch watchInfo, err error) {
-	db := dbConn()
-	// , err := sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
-	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = db.Ping()
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+// func getWatch(id string) (watch watchInfo, err error) {
+// db := dbConn()
+// defer db.Close()
+// if err != nil {
+// 	log.Fatal(err)
+// }
+// err = db.Ping()
+// if err != nil {
+// 	fmt.Println(err.Error())
+// }
 
-	err = db.QueryRow("SELECT id, brand from watches where id = ?;", id).Scan(&watch.ID, &watch.Brand)
-	if err != nil {
-		panic(err.Error())
-	}
+// // do i need to add ";" at end of below function?
+// // check for naming convention in mysql vs code vs frontend
+// //sW (select watches)
+// sW, err := db.Query("SELECT * FROM watches order by id")
 
-	return watch, err
-}
+// wa := watchInfo{}
+// waS := []watchInfo{}
+
+// for sW.Next() {
+// 	var id int
+// 	var brand string
+// 	err = sW.Scan(&id, &brand)
+// 	if err != nil {
+// 		fmt.Println("sW.Scan didn't work")
+// 	}
+// 	wa.ID = id
+// 	wa.Brand = brand
+// 	waS = append(waS, wa)
+
+// }
+// tpl.ExecuteTemplate(w, "pic.gohtml", waS)
+
+// err = db.QueryRow("SELECT id, brand from watches where id = ?;", id).Scan(&watch.ID, &watch.Brand)
+// if err != nil {
+// 	panic(err.Error())
+// }
+
+// return watch, err
+// }
