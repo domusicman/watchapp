@@ -17,7 +17,6 @@ type watchInfo struct {
 
 var (
 	tpl *template.Template
-	// cnn, err = sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
 )
 
 //function to connect to db
@@ -39,6 +38,7 @@ func init() {
 
 func main() {
 	http.HandleFunc("/", index)
+	http.HandleFunc("/upload", uploadWatchInfo)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -46,7 +46,7 @@ func main() {
 func index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	defer db.Close()
-	sW, err := db.Query("SELECT * FROM watches order by id")
+	scanWatches, err := db.Query("SELECT * FROM watches order by id")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,31 +57,42 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	// do i need to add ";" at end of below function?
 	// check for naming convention in mysql vs code vs frontend
-	//sW (select watches)
 
-	wa := watchInfo{}
-	waS := []watchInfo{}
+	watch := watchInfo{}
+	watchSlice := []watchInfo{}
 
-	for sW.Next() {
+	for scanWatches.Next() {
 		var id int
 		var brand string
-		err = sW.Scan(&id, &brand)
+		err = scanWatches.Scan(&id, &brand)
 		if err != nil {
 			fmt.Println("sW.Scan didn't work")
 		}
-		wa.ID = id
-		wa.Brand = brand
-		waS = append(waS, wa)
+		watch.ID = id
+		watch.Brand = brand
+		watchSlice = append(watchSlice, watch)
 
 	}
-	tpl.ExecuteTemplate(w, "pic.gohtml", waS)
-	// watch, err := getWatch("1")
-	// HandleError(w, err)
-
-	// err = tpl.ExecuteTemplate(w, "pic.gohtml", watch)
-	// HandleError(w, err)
+	tpl.ExecuteTemplate(w, "pic.gohtml", watchSlice)
 
 }
+
+func uploadWatchInfo(w http.ResponseWriter, r *http.Request) {
+	// db := dbConn()
+	// defer db.Close()
+	// if r.Method == "POST" {
+	// 	b := r.FormValue("brand")
+	// 	insForm, err := db.Prepare("INSERT INTO watches (brand) VALUES ?")
+	// 	if err != nil {
+	// 		fmt.Println("insert didn't work")
+	// 	}
+	// 	insForm.Exec(b)
+	// 	log.Println("INSERT: Name: " + b)
+	tpl.ExecuteTemplate(w, "upload.gohtml", nil)
+}
+
+// defer db.Close()
+// }
 
 //this is handling an error and can be called it in other page functions
 func HandleError(w http.ResponseWriter, err error) {
@@ -89,46 +100,3 @@ func HandleError(w http.ResponseWriter, err error) {
 		fmt.Println("Index did not work. error in index")
 	}
 }
-
-//This function takes id # as input and outputs watchid and corresponding brand
-
-// func getWatch(id string) (watch watchInfo, err error) {
-// db := dbConn()
-// defer db.Close()
-// if err != nil {
-// 	log.Fatal(err)
-// }
-// err = db.Ping()
-// if err != nil {
-// 	fmt.Println(err.Error())
-// }
-
-// // do i need to add ";" at end of below function?
-// // check for naming convention in mysql vs code vs frontend
-// //sW (select watches)
-// sW, err := db.Query("SELECT * FROM watches order by id")
-
-// wa := watchInfo{}
-// waS := []watchInfo{}
-
-// for sW.Next() {
-// 	var id int
-// 	var brand string
-// 	err = sW.Scan(&id, &brand)
-// 	if err != nil {
-// 		fmt.Println("sW.Scan didn't work")
-// 	}
-// 	wa.ID = id
-// 	wa.Brand = brand
-// 	waS = append(waS, wa)
-
-// }
-// tpl.ExecuteTemplate(w, "pic.gohtml", waS)
-
-// err = db.QueryRow("SELECT id, brand from watches where id = ?;", id).Scan(&watch.ID, &watch.Brand)
-// if err != nil {
-// 	panic(err.Error())
-// }
-
-// return watch, err
-// }
