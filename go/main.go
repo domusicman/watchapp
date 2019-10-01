@@ -17,6 +17,7 @@ type watchInfo struct {
 
 var (
 	tpl *template.Template
+	// cnn, err = sql.Open("mysql", "root:root@tcp(db:3306)/appdb")
 )
 
 //function to connect to db
@@ -78,21 +79,23 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadWatchInfo(w http.ResponseWriter, r *http.Request) {
-	// db := dbConn()
-	// defer db.Close()
-	// if r.Method == "POST" {
-	// 	b := r.FormValue("brand")
-	// 	insForm, err := db.Prepare("INSERT INTO watches (brand) VALUES ?")
-	// 	if err != nil {
-	// 		fmt.Println("insert didn't work")
-	// 	}
-	// 	insForm.Exec(b)
-	// 	log.Println("INSERT: Name: " + b)
-	tpl.ExecuteTemplate(w, "upload.gohtml", nil)
+	db := dbConn()
+	defer db.Close()
+	if r.Method == "POST" {
+		brand := r.FormValue("brand")
+		insForm, err := db.Prepare("INSERT INTO watches (brand) VALUES (?)")
+		if err != nil {
+			fmt.Println("insert didn't work")
+		}
+		insForm.Exec(brand)
+		log.Println("INSERT: Name: " + brand)
+		err := tpl.ExecuteTemplate(w, "/upload.gohtml", watchInfo{brand})
+		if err != nil {
+			panic(err.Error)
+		}
+	}
+	defer db.Close()
 }
-
-// defer db.Close()
-// }
 
 //this is handling an error and can be called it in other page functions
 func HandleError(w http.ResponseWriter, err error) {
