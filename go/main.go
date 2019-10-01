@@ -89,7 +89,7 @@ func uploadWatchInfo(w http.ResponseWriter, r *http.Request) {
 		}
 		insForm.Exec(brand)
 		log.Println("INSERT: Name: " + brand)
-		err := tpl.ExecuteTemplate(w, "/upload.gohtml", watchInfo{brand})
+		err = tpl.ExecuteTemplate(w, "/upload.gohtml", watchInfo{Brand: brand})
 		if err != nil {
 			panic(err.Error)
 		}
