@@ -23,8 +23,8 @@ var (
 //function to connect to db
 func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
-	dbUser := "root"
-	dbPass := "root"
+	dbUser := "dom"
+	dbPass := "dom"
 	dbName := "appdb"
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp"+"(db:3306)/"+dbName)
 	if err != nil {

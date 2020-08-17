@@ -4,10 +4,10 @@ services:
     build:
       context: ./MySQL
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: dom
       MYSQL_DATABASE: appdb
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_USER: dom
+      MYSQL_PASSWORD: dom
     container_name: watch_db
     ports:
       - "3306:3306"
