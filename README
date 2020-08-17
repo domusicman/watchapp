@@ -1,0 +1,20 @@
+Download Repo
+
+$ docker-compose up --build -d 
+
+login into container:
+$ docker exec -it watch_app bash
+
+Run main.go:
+go run main.go
+
+
+Not sure why yet, but when running go run main.go getting this error:
+
+main.go:10:2: no Go files in /go/src/github.com/go-sql-driver/mysql
+
+after removing that file:
+$ rm -rf  /go/src/github.com/go-sql-driver/mysql/
+
+this works fine:
+$ go get -u github.com/go-sql-driver/mysql
