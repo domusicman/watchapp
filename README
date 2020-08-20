@@ -1,13 +1,14 @@
-Download Repo
-
+Run Docker containers:
 $ docker-compose up --build -d 
 
 login into container:
 $ docker exec -it watch_app bash
 
+run the app:
+$go run main.go
+
 Run main.go:
 go run main.go
-
 
 Not sure why yet, but when running go run main.go getting this error:
 
