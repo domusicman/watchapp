@@ -39,6 +39,7 @@ func init() {
 
 func main() {
 	http.HandleFunc("/", index)
+	// http.HandleFunc("/createwatch", createWatch)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -82,6 +83,49 @@ func index(w http.ResponseWriter, r *http.Request) {
 	// HandleError(w, err)
 
 }
+
+// func createWatch(w http.ResponseWriter, r *http.Request) {
+// 	//open connection to db
+// 	//create variables using struct that i'll need. ID and Watch
+// 	//create query to input struct elements into db
+// 	//create mapped submissions for struct elements
+// 	//
+
+// 	//taken from above
+// 	var err error
+
+// 	db := dbConn()
+// 	defer db.Close()
+// 	err = db.Ping()
+// 	// insert watch
+// 	iw := db.Exec("INSERT INTO watches (ID, Brand) VALUES ($1,$2)", info.ID, info.Brand)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 	}
+
+// 	wa := watchInfo{}
+// 	// waS := []watchInfo{}
+
+// 	var id int
+// 	var brand string
+
+// 	wa.ID = id
+// 	wa.Brand = brand
+
+// 	// tpl.ExecuteTemplate(w, "pic.gohtml", waS)
+// 	//old stuff below
+// 	wa.ID := "2"
+// 	wa.Brand := "Jaeger LeCoultre"
+
+// 	// _, err = db.Exec("INSERT INTO watches (ID, Brand) VALUES ($1,$2)", info.ID, info.Brand)
+// 	if err != nil {
+// 	http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+// 	return
+// 	}
+
+// 	fmt.Fprintf(w, "Record Created: ")
+// 	fmt.Fprintf(w, "%s %sn", info.ID, info.Brand) // (3)
+// 	}
 
 //this is handling an error and can be called it in other page functions
 func HandleError(w http.ResponseWriter, err error) {
